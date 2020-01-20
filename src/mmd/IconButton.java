@@ -36,7 +36,7 @@ public class IconButton extends JButton{
 				dm.runningNetflix = true;
 			}
 			
-			bt = new BrowserThread(cmd, controllers, dm.dc);
+			bt = new BrowserThread(cmd, controllers, dm.dc, dm);
 			bt.start();
 			
 			dm.runningNetflix = false;

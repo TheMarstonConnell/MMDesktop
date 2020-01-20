@@ -42,6 +42,7 @@ import sun.audio.*;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -61,6 +62,11 @@ import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
 public class DesktopMenu extends JFrame {
+	
+	Clip music;
+	Timer t = null;
+	boolean musicPlaying = true;
+	
 	JPanel content;
 	JScrollPane scroll;
 
@@ -297,6 +303,64 @@ public class DesktopMenu extends JFrame {
 	    }
 	}
 	
+	public void fadeMusicIn() {
+		
+		t = new Timer(10, new ActionListener() {
+			float vol = -80.0f;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				vol += 1f;
+				FloatControl volume = (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
+		        volume.setValue(vol);
+				if(vol > -10) {
+					vol = -10;
+					t.stop();
+				}
+			}
+		});
+		t.start();
+	}
+	
+	public void fadeMusicOut() {
+		
+		t = new Timer(10, new ActionListener() {
+			float vol = -10.0f;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				
+				FloatControl volume = (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
+				if(vol < -80) {
+					vol = -80;
+					t.stop();
+				}
+		        volume.setValue(vol);
+				
+				vol -= 1f;
+			}
+		});
+		t.start();
+	}
+	
+	public void startMusic()
+	{
+	    try
+	    {
+	        music = AudioSystem.getClip();
+	        music.open(AudioSystem.getAudioInputStream(this.getClass().getResource("mana2.wav")));
+	        music.start();
+	        music.loop(Clip.LOOP_CONTINUOUSLY);
+	        FloatControl volume = (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
+	        volume.setValue(-80.0f);
+	        fadeMusicIn();
+	    }
+	    catch (Exception exc)
+	    {
+	        exc.printStackTrace(System.out);
+	    }
+	}
+	
 	public static BufferedImage makeRoundedCorner(BufferedImage image, int cornerRadius) {
 	    int w = image.getWidth();
 	    int h = image.getHeight();
@@ -425,7 +489,7 @@ public class DesktopMenu extends JFrame {
 
 		this.setVisible(true);
 
-		
+		startMusic();
 		
 		timer = new Timer(1, new ActionListener() {
 
@@ -446,7 +510,14 @@ public class DesktopMenu extends JFrame {
 				sdf = new SimpleDateFormat("EEE d'/'M");
 				date.setText(sdf.format(currentTime));
 
-				if (isActive()) {
+				if(!musicPlaying) {
+					fadeMusicIn();
+					musicPlaying = true;
+				}
+				
+				if (isShowing()) {
+					
+					
 
 					int[] move = { 0, 0, 0, 0, 0, 0 };
 
@@ -569,6 +640,7 @@ public class DesktopMenu extends JFrame {
 						if (buttons.get(selectedBox) instanceof JButton) {
 							JButton butt = (JButton) buttons.get(selectedBox);
 							if(butt instanceof IconButton) {
+//								fadeMusicOut();
 								play("click.wav");
 							}else {
 								play("error.wav");
