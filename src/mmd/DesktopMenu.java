@@ -25,6 +25,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,7 +37,11 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
+import sun.audio.*;
+
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -276,6 +281,20 @@ public class DesktopMenu extends JFrame {
 				}
 			}
 		}
+	}
+	
+	public void play(String filename)
+	{
+	    try
+	    {
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(AudioSystem.getAudioInputStream(this.getClass().getResource(filename)));
+	        clip.start();
+	    }
+	    catch (Exception exc)
+	    {
+	        exc.printStackTrace(System.out);
+	    }
 	}
 	
 	public static BufferedImage makeRoundedCorner(BufferedImage image, int cornerRadius) {
@@ -549,6 +568,11 @@ public class DesktopMenu extends JFrame {
 					if (move[2] == 1) {
 						if (buttons.get(selectedBox) instanceof JButton) {
 							JButton butt = (JButton) buttons.get(selectedBox);
+							if(butt instanceof IconButton) {
+								play("click.wav");
+							}else {
+								play("error.wav");
+							}
 							butt.doClick();
 						}
 					}
