@@ -75,6 +75,8 @@ public class DesktopMenu extends JFrame {
 	JLabel date;
 
 	Image staticImg;
+	
+	boolean hadFocus = true;
 
 	Random rand = new Random();
 
@@ -400,7 +402,7 @@ public class DesktopMenu extends JFrame {
 		else
 			try {
 				Files.write(Paths.get(folder + "\\" + filename.substring(0, filename.indexOf(".")) + ".bat"),
-						(jfc.getDirectory() + "\\" + filename).getBytes());
+						("\"" + jfc.getDirectory() + "\\" + filename + "\"").getBytes());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -515,8 +517,12 @@ public class DesktopMenu extends JFrame {
 					musicPlaying = true;
 				}
 				
-				if (isShowing()) {
+				if (isFocused()) {
 					
+					if(!hadFocus) {
+					fadeMusicIn();	
+					}
+					hadFocus = true;
 					
 
 					int[] move = { 0, 0, 0, 0, 0, 0 };
@@ -649,7 +655,11 @@ public class DesktopMenu extends JFrame {
 						}
 					}
 				} else {
-
+					hadFocus = false;
+						FloatControl volume = (FloatControl) music.getControl(FloatControl.Type.MASTER_GAIN);
+						
+				        volume.setValue(-80f);
+					
 				}
 
 			}

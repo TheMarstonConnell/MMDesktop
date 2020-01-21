@@ -42,11 +42,8 @@ public class BrowserThread extends Thread {
 		ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", cmd.getAbsolutePath());
 		builder.redirectErrorStream(true);
 		Process p = builder.start();
-		while (p.isAlive()) {
-			FloatControl volume = (FloatControl) dm.music.getControl(FloatControl.Type.MASTER_GAIN);
-			
-	        volume.setValue(-80f);
-		}
+		
+		
 	}
 
 	public void run() {
